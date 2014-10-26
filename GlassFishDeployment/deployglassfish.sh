@@ -6,8 +6,7 @@
 
 
 sudo apt-get -y update
-sudo apt-get -y install python-software-properties apache2 wget curl git unzip
-service apache2 stop
+sudo apt-get -y install python-software-properties wget curl git unzip
 
 sudo apt-get -y install openjdk-7-jre
 sudo apt-get -y install openjdk-7-jdk
