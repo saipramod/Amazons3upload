@@ -13,6 +13,7 @@ service apache2 stop
 #sudo apt-get -y install oracle-java7-installer
 
 sudo apt-get -y install openjdk-7-jre
+sudo apt-get -y install openjdk-7-jdk
 cd ~
 
 wget download.java.net/glassfish/4.0/release/glassfish-4.0.zip
@@ -24,5 +25,5 @@ sudo chmod 777 -R /opt/*
 asadmin start-domain
 #cd ~
 git clone https://github.com/saipramod/Amazons3upload.git
-wget https://github.com/saipramod/Amazons3upload/blob/master/target/ITMD544ASS3-1.0-SNAPSHOT.war
+#wget https://github.com/saipramod/Amazons3upload/blob/master/target/ITMD544ASS3-1.0-SNAPSHOT.war
 asadmin deploy /home/ubuntu/Amazons3upload/target/ITMD544ASS3-1.0-SNAPSHOT.war
