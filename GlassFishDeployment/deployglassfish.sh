@@ -19,6 +19,7 @@ sudo unzip glassfish-4.0.zip -d /opt
 export PATH=/opt/glassfish4/bin:$PATH
 sudo chmod 777 -R /opt/*
 asadmin start-domain
-
-wget https://glassfish.java.net/downloads/quickstart/hello.war
-asadmin deploy /home/ee/glassfish/sample/hello.war
+cd ~
+git clone https://github.com/saipramod/Amazons3upload/blob/master/target/ITMD544ASS3-1.0-SNAPSHOT.war
+wget ITMD544ASS3-1.0-SNAPSHOT.war
+asadmin deploy ITMD544ASS3-1.0-SNAPSHOT.war
