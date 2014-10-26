@@ -37,8 +37,10 @@ public class S3upload {
         List bucketNames = new ArrayList();
         AWSCredentials credentials = new BasicAWSCredentials(access, secret);
         AmazonS3 s3client = new AmazonS3Client(credentials);
+        
         for (Bucket bucket : s3client.listBuckets()) {
             bucketNames.add(bucket.getName());
+            s3client.listObjects(bucket.getName());
         }
         //bucketNames.addAll(s3client.listBuckets());
         bucketNames.toString();
