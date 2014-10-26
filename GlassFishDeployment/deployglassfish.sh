@@ -20,10 +20,10 @@ sudo unzip glassfish-4.0.zip -d /opt
 export PATH=/opt/glassfish4/bin:$PATH
 sudo chmod 777 -R /opt/*
 
-/opt/glassfish4/glassfish/domains/domain1/config/domain.xml
+#/opt/glassfish4/glassfish/domains/domain1/config/domain.xml
 
-sudo cat /opt/glassfish4/glassfish/domains/domain1/config/domain.xml | sed 's/"8080"/"80"/' > temp
-cp temp /opt/glassfish4/glassfish/domains/domain1/config/domain.xml
+#sudo cat /opt/glassfish4/glassfish/domains/domain1/config/domain.xml | sed 's/"8080"/"80"/' > temp
+#cp temp /opt/glassfish4/glassfish/domains/domain1/config/domain.xml
 asadmin start-domain
 sudo rm -r Amazons3upload
 #cd ~
