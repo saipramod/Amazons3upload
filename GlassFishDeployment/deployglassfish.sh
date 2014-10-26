@@ -24,5 +24,5 @@ sudo chmod 777 -R /opt/*
 asadmin start-domain
 #cd ~
 git clone https://github.com/saipramod/Amazons3upload.git
-wget ITMD544ASS3-1.0-SNAPSHOT.war
-asadmin deploy ITMD544ASS3-1.0-SNAPSHOT.war
+wget https://github.com/saipramod/Amazons3upload/blob/master/target/ITMD544ASS3-1.0-SNAPSHOT.war
+asadmin deploy /home/ubuntu/Amazons3upload/target/ITMD544ASS3-1.0-SNAPSHOT.war
