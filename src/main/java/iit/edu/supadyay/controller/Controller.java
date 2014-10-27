@@ -72,8 +72,16 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         switch (request.getServletPath()) {
             case "/":
+                List messages = new ArrayList<String>();
                 List bucketNames = new ArrayList();
-                bucketNames = S3upload.listOfBuckets();
+                try {
+                    bucketNames = S3upload.listOfBuckets();
+                }
+                catch (Exception e){
+                    messages.add("Invalid Credentials");
+                    
+                }
+                request.setAttribute("messages", messages);
                 //LOG.log(Level.WARNING, "isa ia" + bucketNames.toString());
                 request.setAttribute("listofbuckets", bucketNames);
                 request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
@@ -117,6 +125,7 @@ public class Controller extends HttpServlet {
                 String filename = Controller.getFilename(filePart);
                 InputStream filecontent = filePart.getInputStream();
         
+                
                 int content;String message = "";
                 while ((content = filecontent.read()) != -1) {
                     // convert to char and display it
@@ -125,8 +134,18 @@ public class Controller extends HttpServlet {
                 }
                 
                 List bucketNames = new ArrayList();
-                bucketNames = S3upload.listOfBuckets();
+                //bucketNames = S3upload.listOfBuckets();
                 //LOG.log(Level.WARNING, "isa ia" + bucketNames.toString());
+                try {
+                    bucketNames = S3upload.listOfBuckets();
+                }
+                catch (Exception e){
+                    messages.add("Invalid Credentials");
+                    request.setAttribute("messages", messages);
+                    request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+                    break;
+                }
+                
                 request.setAttribute("listofbuckets", bucketNames);
  
                 
