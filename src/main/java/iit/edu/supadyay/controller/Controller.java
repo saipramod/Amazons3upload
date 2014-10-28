@@ -79,9 +79,11 @@ public class Controller extends HttpServlet {
                 }
                 catch (Exception e){
                     messages.add("Invalid Credentials");
-                    
+                    request.setAttribute("messages", messages);
+                    request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+                    break;
                 }
-                request.setAttribute("messages", messages);
+                
                 //LOG.log(Level.WARNING, "isa ia" + bucketNames.toString());
                 request.setAttribute("listofbuckets", bucketNames);
                 request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);

@@ -32,8 +32,6 @@ import java.util.logging.Logger;
  */
 public class S3upload {
 
-    //private static final String access = "AKIAIJ3T5PTS4YI4P4WQ";
-    //private static final String secret = "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";
     private static final Logger LOG = Logger.getLogger(S3upload.class.getName());
 
     /**
