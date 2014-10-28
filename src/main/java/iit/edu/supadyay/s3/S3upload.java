@@ -15,7 +15,11 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient;
 import com.amazonaws.services.securitytoken.model.Credentials;
 import com.amazonaws.services.securitytoken.model.GetSessionTokenRequest;
@@ -64,11 +68,24 @@ public class S3upload {
 
     }
 
+    public static List listOfObjects(String bucketname){
+        List objectNames = new ArrayList();
+        AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        System.out.println("Listing keys now");
+        for ( S3ObjectSummary obj :  s3client.listObjects(bucketname).getObjectSummaries()){
+            System.out.println(obj.getKey());
+            objectNames.add(obj.getKey());
+        }
+        //for (ObjectListing obj : s3client.listObjects(bucketname)){
+            
+        //}
+        return objectNames;
+    }
     public static List listOfBuckets() {
         List bucketNames = new ArrayList();
         //AWSCredentials credentials = new BasicAWSCredentials(access, secret);
-        //AmazonS3 s3client = new AmazonS3Client(getCredentials());
-        AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+        AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        //AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
 
         for (Bucket bucket : s3client.listBuckets()) {
             bucketNames.add(bucket.getName());
@@ -84,23 +101,18 @@ public class S3upload {
         //access = "AKIAJ2YSLRUZR5B3F5HQ";
         //secret = "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";
         //AWSCredentials credentials = new BasicAWSCredentials(access, secret);
-        //AmazonS3 s3client = new AmazonS3Client(getCredentials());
-        AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+        AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        //AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
         try {
             System.out.println("Uploading a new object to S3 from a file\n");
             File file = new File(uploadFileName);
-            /*boolean bucketexists = false;
-             for (Bucket bucket : s3client.listBuckets()) {
-             System.out.println(" - " + bucket.getName());
-             if (bucket.getName().equals(bucketName))
-             bucketexists = true;
-             }*/
-            //if (!bucketexists)
             System.out.println("I am before here\n");
             s3client.createBucket(bucketName);
             System.out.println("I am here\n");
+            
             s3client.putObject(new PutObjectRequest(
                     bucketName, keyName, file));
+            //s3client.setObjectAcl(bucketName, keyName, CannedAccessControlList.PublicReadWrite);
 
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which "

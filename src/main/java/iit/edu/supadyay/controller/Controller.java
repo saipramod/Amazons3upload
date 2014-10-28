@@ -7,6 +7,7 @@
 package iit.edu.supadyay.controller;
 
 import iit.edu.supadyay.s3.S3upload;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,20 +16,25 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 /**
  *
  * @author supramo
  */
-@MultipartConfig
+@MultipartConfig(fileSizeThreshold=1024*1024*2, // 2MB
+                 maxFileSize=1024*1024*10,      // 10MB
+                 maxRequestSize=1024*1024*50)   // 50MB
 public class Controller extends HttpServlet {
 
     private static final Logger LOG = Logger.getLogger(Controller.class.getName());
@@ -70,6 +76,7 @@ public class Controller extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(true);
         switch (request.getServletPath()) {
             case "/":
                 List messages = new ArrayList<String>();
@@ -89,6 +96,42 @@ public class Controller extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
                 
                 break;
+            case "/bucket":
+                List objectNames = new ArrayList();
+                String bucketname = request.getParameter("name");
+                System.out.println("bucketname is :" + bucketname);
+                objectNames = S3upload.listOfObjects(bucketname);
+                //objectNames.add("you click on me");
+                request.setAttribute("listofobjects", objectNames);
+                
+                session.setAttribute("bucketchosen", bucketname);
+                request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
+                break;
+            case "/object":
+                if (session.getAttribute("bucketchosen") == null){
+                    request.getRequestDispatcher("/").forward(request, response);
+                    break;
+                }
+                String objectname = request.getParameter("name");
+                String cobucketname = session.getAttribute("bucketchosen").toString();
+                System.out.println(cobucketname);
+                String url = "https://"+cobucketname+".s3.amazonaws.com/"+objectname;
+                //String url = "https://s3.amazonaws.com/"+cobucketname+"/"+objectname;
+                System.out.println(url);
+                response.getWriter().println("<a href='/'>Go Back</a>");
+                System.out.println(objectname);
+                String ext = getFileExtension(objectname);
+                System.out.println(ext);
+                if (ext.toLowerCase(Locale.ENGLISH).equals(".png") || ext.toLowerCase(Locale.ENGLISH).equals(".jpg") || ext.toLowerCase(Locale.ENGLISH).equals(".jpeg")){
+                    response.getWriter().println("<br><img src='"+url +"'>");
+                    break;
+                }
+                else{
+                    response.getWriter().println("<br>This is not an image and you cannot view it");
+                    break;
+                }
+                
+                
             default:
                 response.getWriter().println("<a href='"+request.getContextPath() +"'>Page not found</a>");
                 break;
@@ -105,6 +148,16 @@ public class Controller extends HttpServlet {
     return null;
     }
 
+    private static String extractFileName(Part part) {
+    String contentDisp = part.getHeader("content-disposition");
+    String[] items = contentDisp.split(";");
+    for (String s : items) {
+        if (s.trim().startsWith("filename")) {
+            return s.substring(s.indexOf("=") + 2, s.length()-1);
+        }
+    }
+    return "";
+}
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -113,28 +166,25 @@ public class Controller extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
+    private String getFileExtension(String name) {
+        int lastIndexOf = name.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return ""; // empty extension
+        }
+        return name.substring(lastIndexOf);
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         switch (request.getServletPath()) {
             case "/upload":
                 List messages = new ArrayList<String>();
-                
                 String filePath = "";
                 String bucketName = request.getParameter("bucket");
-                //String NameName = request.getParameter("keyname");
                 Part filePart = request.getPart("uploadFile");
                 String filename = Controller.getFilename(filePart);
                 InputStream filecontent = filePart.getInputStream();
-        
-                
-                int content;String message = "";
-                while ((content = filecontent.read()) != -1) {
-                    // convert to char and display it
-                    //System.out.print((char) content);
-                    message += (char) content;
-                }
-                
                 List bucketNames = new ArrayList();
                 //bucketNames = S3upload.listOfBuckets();
                 //LOG.log(Level.WARNING, "isa ia" + bucketNames.toString());
@@ -147,25 +197,11 @@ public class Controller extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
                     break;
                 }
-                
-                request.setAttribute("listofbuckets", bucketNames);
- 
-                
-        	
-        //      PrintWriter writer = new PrintWriter(filename, "UTF-8");
-        //      writer.println(message);
-        //       writer.close();
-                
-        
+                request.setAttribute("listofbuckets", bucketNames);        
                 LOG.log(Level.WARNING,"file name is :" + filename);
                 if (bucketName.trim().isEmpty()){
-                    //LOG.log(Level.WARNING ,"setting firstname message");
                     messages.add("bucketname cannot be empty");
                 }
-                /*if (keyName.trim().isEmpty()){
-                    //LOG.log(Level.WARNING ,"setting firstname message");
-                    messages.add("keyname cannot be empty");
-                }*/
                 if (filename.trim().isEmpty()){
                     //LOG.log(Level.WARNING ,"setting firstname message");
                     messages.add("please upload a file");
@@ -175,17 +211,39 @@ public class Controller extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
                     break;
                 }
-                File file = new File("~/"+filename);
-                if (!file.exists()) {
-			file.createNewFile();
-		}
-                FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                filePath = file.getAbsoluteFile().getAbsolutePath();
-                LOG.log(Level.WARNING,file.getAbsoluteFile().getAbsolutePath());
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(message);
-		bw.close();
+                
                 try {
+                    File file = new File(filename);
+                    if (!file.exists()) {
+                            file.createNewFile();
+                    }
+                    String ext = getFileExtension(filename);
+                    if (ext.toLowerCase(Locale.ENGLISH).equals(".png") || ext.toLowerCase(Locale.ENGLISH).equals(".jpg") || ext.toLowerCase(Locale.ENGLISH).equals(".jpeg")){
+                        BufferedImage imBuff = ImageIO.read(filecontent);
+                        //File outputfile = new File(filename);                    
+                        ImageIO.write(imBuff, "png", file);
+                    }
+                    else{
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+                        int content;
+                        while ((content = filecontent.read()) != -1) {
+                            bw.write(content);
+                        }
+                    
+                        bw.close();
+                        
+                    }
+                    
+                    /*for (Part part : request.getParts()) {
+                       //System.out.println(part.getSize());
+                        //System.out.println(part.getContentType());
+                        //System.out.println(part.getName());
+                        part.write(filename);
+                    }*/
+                    //FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    filePath = file.getAbsoluteFile().getAbsolutePath();
+                    LOG.log(Level.WARNING,file.getAbsolutePath());
+
                     if (S3upload.upload(bucketName, filePath, filename)){
                         messages.add("FILE Successfully Uploaded");
                         request.setAttribute("messages", messages);
@@ -202,7 +260,8 @@ public class Controller extends HttpServlet {
                 } 
                 catch (Exception ex) {
                    //Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-                   messages.add("File not uploaded, please try again");
+                    System.out.println(ex.getMessage());
+                    messages.add("File not uploaded, please try again");
                    request.setAttribute("messages", messages);
                    request.getRequestDispatcher("/WEB-INF/index.jsp").forward(request, response);
                    break;

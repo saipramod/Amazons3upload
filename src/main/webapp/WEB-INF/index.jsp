@@ -46,10 +46,22 @@
 </div>
 <div class="container">
     <br>
-    <p> Below are a list of your buckets </p>
+    <p> Below are a list of your buckets, Click on each of them to view contents </p>
     <c:forEach items="${requestScope.listofbuckets}" var="message">
-        <p>
-            <ul style='color:blue;font-size: 20px'> - ${message}</ul>
+        <p style='color:blue;font-size: 20px'>
+            <a href="${pageContext.request.contextPath}/bucket?name=${message}">
+                ${message}
+            </a>
+            <!--<ul style='color:blue;font-size: 20px'> - ${message}</ul>-->
+        </p>
+    </c:forEach>
+        
+    <c:forEach items="${requestScope.listofobjects}" var="message">
+        <p style='color:blue;font-size: 20px'>
+            <a href="${pageContext.request.contextPath}/object?name=${message}">
+                ${message}
+            </a>
+            <!--<ul style='color:blue;font-size: 20px'> - ${message}</ul>-->
         </p>
     </c:forEach>
 </div>
