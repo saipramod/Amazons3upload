@@ -113,7 +113,7 @@ public class S3upload {
             
             s3client.putObject(new PutObjectRequest(
                     bucketName, keyName, file));
-            //s3client.setObjectAcl(bucketName, keyName, CannedAccessControlList.PublicReadWrite);
+            s3client.setObjectAcl(bucketName, keyName, CannedAccessControlList.PublicReadWrite);
 
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which "
