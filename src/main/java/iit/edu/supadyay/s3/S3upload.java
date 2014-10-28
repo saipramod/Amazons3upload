@@ -70,7 +70,8 @@ public class S3upload {
 
     public static List listOfObjects(String bucketname){
         List objectNames = new ArrayList();
-        AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        //AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
         System.out.println("Listing keys now");
         for ( S3ObjectSummary obj :  s3client.listObjects(bucketname).getObjectSummaries()){
             System.out.println(obj.getKey());
