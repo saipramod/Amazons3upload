@@ -84,8 +84,8 @@ public class S3upload {
     public static List listOfBuckets() {
         List bucketNames = new ArrayList();
         //AWSCredentials credentials = new BasicAWSCredentials(access, secret);
-        AmazonS3 s3client = new AmazonS3Client(getCredentials());
-        //AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+        //AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
 
         for (Bucket bucket : s3client.listBuckets()) {
             bucketNames.add(bucket.getName());
@@ -101,8 +101,8 @@ public class S3upload {
         //access = "AKIAJ2YSLRUZR5B3F5HQ";
         //secret = "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";
         //AWSCredentials credentials = new BasicAWSCredentials(access, secret);
-        AmazonS3 s3client = new AmazonS3Client(getCredentials());
-        //AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+        //AmazonS3 s3client = new AmazonS3Client(getCredentials());
+        AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
         try {
             System.out.println("Uploading a new object to S3 from a file\n");
             File file = new File(uploadFileName);
