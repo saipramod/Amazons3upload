@@ -10,7 +10,7 @@
 <ul> Launch an ubuntu instance </ul>
 <ul> Use git to clone the repo using the command git https://github.com/saipramod/Amazons3upload </ul>
 <ul> Run the script present inside the GlassFishDeplotyment Folder</ul>
-<ul> Open your web server such as http://<ip address>:8080/ </ul>
+<ul> Open your web server such as http://ip address:8080/ </ul>
 
 
 
